@@ -2,7 +2,9 @@ from ..dbn import init_DBN, train_DBN
 from ..rbm import entree_sortie_rbm
 import numpy as np
 from matplotlib import pyplot as plt
-
+import seaborn as sns
+from sklearn.utils import shuffle
+import pandas as pd
 
 def init_DNN(sizes, output_size=10):
     """
@@ -12,6 +14,7 @@ def init_DNN(sizes, output_size=10):
     return: the initialized DNN model
     """
     configuration = sizes + [output_size]
+    print(configuration)
     return init_DBN(configuration)
 
 def pretrain_DNN(X, dnn, epochs=100, learning_rate=0.1, batch_size=128):
@@ -24,15 +27,19 @@ def pretrain_DNN(X, dnn, epochs=100, learning_rate=0.1, batch_size=128):
     param: batch_size: size of mini-batches
     return: the pretrained DNN model
     """
-    dbn= {'W': dnn['W'][:-1], 'a': dnn['a'][:-1], 'b': dnn['b'][:-1]}
+    dbn = dnn[:-1]
     dbn = train_DBN(X, dbn, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
-    dnn['W'][:-1] = dbn['W']
-    dnn['a'][:-1] = dbn['a']
-    dnn['b'][:-1] = dbn['b']
+    dnn[:-1] = dbn
     return dnn
 
 
 def calcul_softmax(rbm, X):
+    """
+    Calculate the softmax probabilities for the given layer and input data.
+    param: layer: a dictionary containing the weights 'W' and biases 'b' of the layer
+    param: X: input data
+    return: softmax probabilities
+    """
     # Calculate the logits
     logits = np.dot(X, rbm['W']) + rbm['b']
     
@@ -49,15 +56,17 @@ def entree_sortie_reseau(DNN, X):
     param: X: the input data
     return: the output of the DNN
     """
+    v = X.copy()
     sorties = [X]  # List to store the outputs of each layer
     proba_sortie = None  # Will store the output of the last layer
     
-    for i in range(len(DNN['W'])-1):
-        RBM = {'W': DNN['W'][i], 'a': DNN['a'][i], 'b': DNN['b'][i]}
-        v = np.random.binomial(1, entree_sortie_rbm(RBM, sorties[-1]))
-        sorties.append(v)
-    RBM = {'W': DNN['W'][-1], 'a': DNN['a'][-1], 'b': DNN['b'][-1]}
-    proba_sortie = calcul_softmax(RBM, sorties[-1])
+    for i in range(len(DNN)-1):
+        rbm = DNN[i]
+        p_h = entree_sortie_rbm(rbm, v)
+        v = np.random.binomial(1, p_h)
+        sorties.append(p_h)
+    rbm_classification = DNN[-1]
+    proba_sortie = calcul_softmax(rbm_classification, v)
     
     return sorties, proba_sortie
 
@@ -74,76 +83,76 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
     param: verbose: whether to print the loss at each epoch
     param: plot: whether to plot the loss
     return: the trained DNN model"""
-    min_loss = np.inf  # Initialize the minimum loss to infinity
+    # Convert y to one-hot encoded format using pd.get_dummies
+    y_one_hot = pd.get_dummies(y).values
+
+    best_loss = float('inf')  # Initialize the minimum loss to infinity
     loss = []
-    patience = 5
+    patience = 10  # Number of epochs to wait before early stopping
     wait = 0
-    train_loss = 1000  # Initialize minimum loss to infinity
+    
     for epoch in range(epochs):
-        # Shuffle the data
-        indices = np.random.permutation(len(X))
-        X_shuffled = X[indices]
-        y_shuffled = y[indices]
-        
-        # Split the data into mini-batches
-        num_batches = len(X) // batch_size
-        X_batches = np.array_split(X_shuffled, num_batches)
-        y_batches = np.array_split(y_shuffled, num_batches)
+        # Shuffle the data using sklearn shuffle
+        X_shuffled, y_shuffled = shuffle(X, y_one_hot)
         
         loss_batches = []
         # Iterate over each mini-batch
-        for X_batch, y_batch in zip(X_batches, y_batches):
+        for batch in range(0, X.shape[0], batch_size):
+            
+            X_batch = X_shuffled[batch: min(batch + batch_size, X.shape[0]), :]
+            y_batch = y_shuffled[batch: min(batch + batch_size, X.shape[0])]
 
             # Forward propagation
             sorties, proba_sortie = entree_sortie_reseau(dnn, X_batch)
             
-            # Convert y_batch to one-hot encoded format
-            num_classes = proba_sortie.shape[1]
-            y_one_hot = np.eye(num_classes)[y_batch]
 
             # Loss calculation
-            loss_batch = -np.mean(np.sum(y_one_hot * np.log(proba_sortie), axis=1))
+            loss_batch = -np.mean(np.sum(y_batch * np.log(proba_sortie), axis=1))
             loss_batches.append(loss_batch)
             
             # Backward propagation
             # Last layer
-            delta = proba_sortie - y_one_hot
+            delta = proba_sortie - y_batch
             grad_W = np.dot(sorties[-1].T, delta) / batch_size
             grad_b = np.mean(delta, axis=0)
-            dnn['W'][-1] -= learning_rate * grad_W
-            dnn['b'][-1] -= learning_rate * grad_b
+            dnn[-1]['W'] -= learning_rate * grad_W
+            dnn[-1]['b'] -= learning_rate * grad_b
 
             # Hidden layers
-            for i in range(2, len(dnn['W'])):
+            for i in range(2, len(dnn)+1):
                 if i == 2:  # Classification layer
-                    RBM = {'W': dnn['W'][-1].T, 'a': dnn['a'][-1], 'b': dnn['b'][-1]}  # Transpose W
-                    delta = np.dot(delta, RBM['W']) * sorties[-1] * (1 - sorties[-1])
+                    RBM = dnn[-1]
+                    delta = np.dot(delta, RBM['W'].T) * sorties[-1] * (1 - sorties[-1])
                 else:
-                    RBM = {'W': dnn['W'][-i + 1].T, 'a': dnn['a'][-i + 1], 'b': dnn['b'][-i + 1]}
-                    delta = np.dot(delta, RBM['W']) * sorties[-i] * (1 - sorties[-i])
-                if i == len(dnn['W']) - 1:
+                    RBM = dnn[-i+1]
+                    delta = np.dot(delta, RBM['W'].T) * sorties[-i+1] * (1 - sorties[-i+1])
+                if i == len(dnn):
                     grad_W = np.dot(X_batch.T, delta)
                 else:
-                    grad_W = np.dot(sorties[-i - 1].T, delta)
+                    grad_W = np.dot(sorties[-i].T, delta)
                 
                 grad_b = np.mean(delta, axis=0)
     
                 # Update weights and biases
-                dnn['W'][-i - 1] -= learning_rate * grad_W
-                dnn['b'][-i - 1] -= learning_rate * grad_b
+                dnn[-i]['W'] -= learning_rate * grad_W
+                dnn[-i]['b'] -= learning_rate * grad_b
 
 
         # Calculate the cross entropy loss for the epoch
-        previous_loss = train_loss
         train_loss = float(np.mean(loss_batches))
         loss.append(train_loss)
         if verbose:
             print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss}")
 
-        # Check for improvement
-        if wait < patience  and round(train_loss, 3) == round(previous_loss, 3):
-                wait += 1
-        elif wait == patience:
+        # Check if current loss is less than the best loss encountered so far
+        if train_loss < best_loss:
+            best_loss = train_loss
+            wait = 0  # reset wait since we've seen improvement
+        else:
+            wait += 1  # increment wait since there was no improvement
+
+        # If we have waited for 'patience' epochs without improvement, stop training
+        if wait >= patience:
             print("Early stopping due to no improvement in Loss.")
             break
         
@@ -165,7 +174,7 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
     return dnn
 
 
-def test_dnn(X, y, dnn, verbose=True):
+def test_dnn(X, y, dnn, verbose=False):
     _, proba_sortie = entree_sortie_reseau(dnn, X)
     predictions = np.argmax(proba_sortie, axis=1)
     accuracy = np.mean(predictions == y)
@@ -174,12 +183,14 @@ def test_dnn(X, y, dnn, verbose=True):
     return accuracy
 
 
-def plot_proba(data, dnn, n =10):
-    _, pred_labels = entree_sortie_reseau(dnn, data)
+def box_plot_proba(data, dnn, k, save_path=None):
+    _, proba_sortie = entree_sortie_reseau(dnn, data)
     plt.figure()
-    plt.scatter(np.arange(0, n), pred_labels)
+    sns.boxplot(data=proba_sortie)
     plt.xlabel("Classes")
-    plt.ylabel("Predicted probability for each class")
-    plt.title("Probabilities by class")
+    plt.ylabel("Predicted probability")
+    plt.title("Distribution of probabilities of the class {k}")
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show(block=False)
     plt.close()

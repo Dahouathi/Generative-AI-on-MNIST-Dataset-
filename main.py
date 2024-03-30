@@ -2,7 +2,7 @@ from src.data_utils import lire_alpha_digit , lire_mnist
 from src.data_utils import save_model, load_model, plot_error_from_accuracy
 from src.rbm import init_RBM, train_RBM, generer_image_RBM
 from src.dbn import init_DBN, train_DBN, generate_image_DBN
-from src.dnn import init_DNN, pretrain_DNN, retropropagation, test_dnn, plot_proba
+from src.dnn import init_DNN, pretrain_DNN, retropropagation, test_dnn, box_plot_proba
 import numpy as np
 
 def first_run_experiment():
@@ -52,7 +52,7 @@ def first_run_experiment():
     # Plot the probability for classes 1, 2, and 3
     for k in range(1, 4):
         idx = np.where(y_test == k)[0]
-        plot_proba(X_test[idx], dnn, k, save_path=f'./figs/proba_{k}.png')
+        box_plot_proba(X_test[idx], dnn, k, save_path=f'./figs/proba_{k}.png')
 
 def compare_pretrained_vs_random():
     """

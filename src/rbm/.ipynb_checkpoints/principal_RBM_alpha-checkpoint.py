@@ -50,7 +50,7 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=Fal
     :return the trained RBM model
     """
     # Initialize early stopping parameters
-    patience = 10  # Number of epochs to wait before early stopping
+    patience = 100  # Number of epochs to wait before early stopping
     wait = 0
     best_mse = float('inf')  # Initialize best MSE to infinity
     

@@ -1,0 +1,3 @@
+Model loaded from ./models/dnn_mnist_fully_trained784200200.pkl
+Fully trained model loaded.
+DNN accuracy on test dataset: 0.9162
