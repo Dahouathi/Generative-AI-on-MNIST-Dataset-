@@ -50,7 +50,7 @@ def first_run_experiment():
     print("DNN accuracy on test dataset:", acc)
 
     # Plot the probability for classes 1, 2, and 3
-    for k in range(1, 4):
+    for k in range(0, 9):
         idx = np.where(y_test == k)[0]
         box_plot_proba(X_test[idx], dnn, k, save_path=f'./figs/proba_{k}.png')
 
@@ -344,7 +344,7 @@ y_shape = 16
 output_dim = 10
 epochs_rbm = 100
 epochs_dnn = 200
-learning_rate = 0.08
+learning_rate = 0.1
 batch_size = 128
 nb_iterations = 500 
 nb_images = 4

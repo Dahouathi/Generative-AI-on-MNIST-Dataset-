@@ -1,0 +1,52 @@
+Script started
+Warning: The file ./models/dnn_mnist_pretrained_datasize200_fully_trained784200200200.pkl does not exist.
+Warning: The file ./models/dnn_mnist_pretrained_datasize200784200200200.pkl does not exist.
+Pretrained model with training size 200 not found. Initializing and pretraining a new model.
+[784, 200, 200, 10]
+Training layer 1
+Training layer 2
+Model saved to ./models/dnn_mnist_pretrained_datasize200784200200200.pkl
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_datasize200_fully_trained784200200200.pkl
+Warning: The file ./models/dnn_mnist_random_datasize200_fully_trained784200200200.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_datasize200784200200200.pkl does not exist.
+Randomly initialized model with training size 200 not found. Initializing a new model.
+[784, 200, 200, 10]
+Model saved to ./models/dnn_mnist_random_datasize200_fully_trained784200200200.pkl
+Pretrained DNN accuracy with training size 200: 0.7967
+Randomly initialized DNN accuracy with training size 200: 0.7776
+Warning: The file ./models/dnn_mnist_pretrained_datasize250_fully_trained784200200250.pkl does not exist.
+Warning: The file ./models/dnn_mnist_pretrained_datasize250784200200250.pkl does not exist.
+Pretrained model with training size 250 not found. Initializing and pretraining a new model.
+[784, 200, 200, 10]
+Training layer 1
+Training layer 2
+Model saved to ./models/dnn_mnist_pretrained_datasize250784200200250.pkl
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_datasize250_fully_trained784200200250.pkl
+Warning: The file ./models/dnn_mnist_random_datasize250_fully_trained784200200250.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_datasize250784200200250.pkl does not exist.
+Randomly initialized model with training size 250 not found. Initializing a new model.
+[784, 200, 200, 10]
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_random_datasize250_fully_trained784200200250.pkl
+Pretrained DNN accuracy with training size 250: 0.8169
+Randomly initialized DNN accuracy with training size 250: 0.1082
+Warning: The file ./models/dnn_mnist_pretrained_datasize300_fully_trained784200200300.pkl does not exist.
+Warning: The file ./models/dnn_mnist_pretrained_datasize300784200200300.pkl does not exist.
+Pretrained model with training size 300 not found. Initializing and pretraining a new model.
+[784, 200, 200, 10]
+Training layer 1
+Training layer 2
+Model saved to ./models/dnn_mnist_pretrained_datasize300784200200300.pkl
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_datasize300_fully_trained784200200300.pkl
+Warning: The file ./models/dnn_mnist_random_datasize300_fully_trained784200200300.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_datasize300784200200300.pkl does not exist.
+Randomly initialized model with training size 300 not found. Initializing a new model.
+[784, 200, 200, 10]
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_random_datasize300_fully_trained784200200300.pkl
+Pretrained DNN accuracy with training size 300: 0.8284
+Randomly initialized DNN accuracy with training size 300: 0.1042
+Plot saved to ./figs/train_size_analysis.png

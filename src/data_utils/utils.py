@@ -62,16 +62,16 @@ def plot_error_from_accuracy(accuracy1, accuracy2, parameters, parameter_name, s
     fig, ax = plt.subplots(1, 2, figsize=(15, 10))
 
     # Plot for the pretrained network
-    ax[0].plot(parameters, error_rate1, color='blue', linestyle='-', marker='o', markersize=8, label='Pretrained Network')
-    ax[0].set_title("Impact of " + parameter_name + " on pretrained network", fontsize=14)
+    ax[0].plot(parameters, error_rate1, color='blue', linestyle='-', marker='o', markersize=8, label='Pretrained DNN')
+    ax[0].set_title("Impact of " + parameter_name + " on pretrained DNN", fontsize=14)
     ax[0].set_xlabel(parameter_name, fontsize=12)
     ax[0].set_ylabel("Error Rate", fontsize=12)
     ax[0].grid(True, which='both', linestyle='--', linewidth=0.5)
     ax[0].legend()
 
     # Plot for the neural network without pretraining
-    ax[1].plot(parameters, error_rate2, color='red', linestyle='-', marker='x', markersize=8, label='Neural Network')
-    ax[1].set_title("Impact of " + parameter_name + " on neural network", fontsize=14)
+    ax[1].plot(parameters, error_rate2, color='red', linestyle='-', marker='x', markersize=8, label='DNN')
+    ax[1].set_title("Impact of " + parameter_name + " on random DNN", fontsize=14)
     ax[1].set_xlabel(parameter_name, fontsize=12)
     ax[1].set_ylabel("Error Rate", fontsize=12)
     ax[1].grid(True, which='both', linestyle='--', linewidth=0.5)

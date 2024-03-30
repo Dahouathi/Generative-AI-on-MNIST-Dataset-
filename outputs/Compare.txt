@@ -1,0 +1,15 @@
+Warning: The file ./models/dnn_mnist_pretrained_fully_trained784200200.pkl does not exist.
+Model loaded from ./models/dnn_mnist_pretrained784200200.pkl
+Pretrained model loaded.
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_fully_trained784200200.pkl
+Fully trained pretrained model saved.
+Warning: The file ./models/dnn_mnist_random_fully_trained784200200.pkl does not exist.
+Randomly initialized model not found. Initializing a new model.
+[784, 200, 200, 10]
+Model saved to ./models/dnn_mnist_random_fully_trained784200200.pkl
+Fully trained randomly initialized model saved.
+Pretrained DNN accuracy on train dataset: 0.9994833333333333
+Randomly initialized DNN accuracy on train dataset: 0.9979
+Pretrained DNN accuracy on test dataset: 0.9736
+Randomly initialized DNN accuracy on test dataset: 0.9625

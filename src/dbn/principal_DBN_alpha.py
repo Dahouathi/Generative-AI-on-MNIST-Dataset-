@@ -81,7 +81,7 @@ def generate_image_DBN(dbn, nb_images, x_shape=28, y_shape=28, nb_iterations=100
         # Reshape and Plot generated images
         fig, axes = plt.subplots(1, nb_images, figsize=(10, 2))
         for i in range(nb_images):
-            axes[i].imshow(images[i], cmap="gray")
+            axes[i].imshow(images[i])
             axes[i].axis("off")
         plt.suptitle(f"Number of layers {len(dbn)}")
         if save_path:

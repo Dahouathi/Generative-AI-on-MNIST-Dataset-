@@ -85,10 +85,10 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
     return: the trained DNN model"""
     # Convert y to one-hot encoded format using pd.get_dummies
     y_one_hot = pd.get_dummies(y).values
-
+    train_loss=100
     best_loss = float('inf')  # Initialize the minimum loss to infinity
     loss = []
-    patience = 10  # Number of epochs to wait before early stopping
+    patience = 5  # Number of epochs to wait before early stopping
     wait = 0
     
     for epoch in range(epochs):
@@ -139,17 +139,25 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
 
 
         # Calculate the cross entropy loss for the epoch
+        previous_loss=train_loss
         train_loss = float(np.mean(loss_batches))
         loss.append(train_loss)
         if verbose:
             print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss}")
 
-        # Check if current loss is less than the best loss encountered so far
-        if train_loss < best_loss:
-            best_loss = train_loss
-            wait = 0  # reset wait since we've seen improvement
-        else:
-            wait += 1  # increment wait since there was no improvement
+        # Early stopping
+        if epoch>epochs/10:
+            # Check if current loss is less than the best loss encountered so far
+            if train_loss < best_loss:
+                # If so, update the best loss and reset wait
+                if abs(previous_loss - train_loss) < 1e-4: # if the loss is not decreasing
+                    wait+=1
+                else:
+                    wait = 0
+                best_loss = train_loss
+                # reset wait since we've seen improvement
+            else:
+                wait += 1  # increment wait since there was no improvement
 
         # If we have waited for 'patience' epochs without improvement, stop training
         if wait >= patience:
@@ -189,7 +197,7 @@ def box_plot_proba(data, dnn, k, save_path=None):
     sns.boxplot(data=proba_sortie)
     plt.xlabel("Classes")
     plt.ylabel("Predicted probability")
-    plt.title("Distribution of probabilities of the class {k}")
+    plt.title("Distribution of probabilities of the class {}".format(k))
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show(block=False)

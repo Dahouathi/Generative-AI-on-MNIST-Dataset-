@@ -122,7 +122,7 @@ def generer_image_RBM(rbm, nb_images,x_shape=28, y_shape=28, nb_iterations=100, 
     if Plot:
         for i in range(nb_images):
             plt.subplot(1, nb_images, i+1)
-            plt.imshow(images[i].reshape((x_shape, y_shape)), cmap='gray')  
+            plt.imshow(images[i].reshape((x_shape, y_shape)))  
             plt.axis('off')
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
