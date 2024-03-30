@@ -47,7 +47,7 @@ def load_model(file_name: str, settings: list):
             print(f"Model loaded from {filepath}")
             return model
     except FileNotFoundError:
-        print(f"Error: The file {filepath} does not exist.")
+        print(f"Warning: The file {filepath} does not exist.")
         return None
     except Exception as e:
         print(f"An error occurred while loading the model: {e}")
