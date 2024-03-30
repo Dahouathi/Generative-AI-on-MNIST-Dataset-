@@ -7,7 +7,7 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
-def init_RBM(num_visible: int, num_hidden: int, mu: float = 0, sigma: float = 0.01):
+def init_RBM(num_visible: int, num_hidden: int, mu: float = 0, sigma: float = 0.1):
     """ 
     Initialize a Restricted Boltzmann Machine (RBM) with the given dimensions and parameters.
     
@@ -55,7 +55,7 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=Fal
         mse = 0
         patience = 5 # Number of epochs to wait before early stopping
         wait = 0
-        min_mse = np.inf  # Initialize minimum MSE to infinity
+        previous_mse = 1000  # Initialize minimum MSE to infinity
         for i in range(0, x.shape[0], batch_size):
             batch = x[i:i+batch_size]
             v0 = batch
@@ -78,25 +78,20 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=Fal
             rbm['a'] += learning_rate * grad_a / batch_size
             rbm['b'] += learning_rate * grad_b / batch_size
 
-            mse += float(np.mean((v0 - v1) ** 2))
-            
+        h_epoch = entree_sortie_rbm(rbm, X)
+        X_reconstructed = sortie_entree_rbm(rbm, h_epoch)
+        previous_mse = mse
+        mse = np.sum((X_reconstructed - X) ** 2) / X.size    
         mse /= x.shape[0] // batch_size
         if verbose:
             print(f"Epoch {epoch + 1}/{epochs}, Mean Square Error : {mse}")
         # Check for improvement
-        if mse < min_mse:
-            min_mse = mse  # Update minimum MSE
-            wait = 0  # Reset wait counter
-        else:
-            wait += 1  # Increment wait counter
-
-        # Check for early stopping
-        if wait >= patience:
-            if verbose:
-                print("Early stopping due to no improvement in MSE.")
+        if wait < patience and round(mse, 3) == round(previous_mse, 3):
+                wait += 1
+        elif wait == patience:
+            print("Early stopping due to no improvement in MSE.")
             break
         
-
     return rbm
 
 def generer_image_RBM(rbm, nb_images,x_shape=28, y_shape=28, nb_iterations=100, Plot=True, save_path=None ):

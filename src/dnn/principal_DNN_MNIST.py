@@ -78,6 +78,7 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
     loss = []
     patience = 5
     wait = 0
+    train_loss = 1000  # Initialize minimum loss to infinity
     for epoch in range(epochs):
         # Shuffle the data
         indices = np.random.permutation(len(X))
@@ -133,20 +134,16 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
 
 
         # Calculate the cross entropy loss for the epoch
+        previous_loss = train_loss
         train_loss = float(np.mean(loss_batches))
         loss.append(train_loss)
         if verbose:
             print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss}")
 
         # Check for improvement
-        if train_loss < min_loss:
-            min_loss = train_loss  # Update minimum loss
-            wait = 0  # Reset wait counter
-        else:
-            wait += 1  # Increment wait counter
-
-        # Check for early stopping
-        if wait >= patience:
+        if wait < patience  and round(train_loss, 3) == round(previous_loss, 3):
+                wait += 1
+        elif wait == patience:
             print("Early stopping due to no improvement in Loss.")
             break
         

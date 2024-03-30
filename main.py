@@ -344,7 +344,7 @@ y_shape = 16
 output_dim = 10
 epochs_rbm = 100
 epochs_dnn = 200
-learning_rate = 0.1
+learning_rate = 0.08
 batch_size = 128
 nb_iterations = 500 
 nb_images = 4
@@ -381,7 +381,6 @@ parser.add_argument('--neurons', nargs='+', type=int, help="List of neuron count
 parser.add_argument('--train_sizes', nargs='+', type=int, help="List of training sizes to test, separated by spaces.")
 
 args = parser.parse_args()
-print(args)
 
 if args.experiment_type == 'first_run':
     # Here, you would call a function to run the first experiment
