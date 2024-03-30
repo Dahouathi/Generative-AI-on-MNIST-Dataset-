@@ -19,6 +19,5 @@ def lire_mnist(data_path: str, indices: np.ndarray, data_type: str, thrshold: in
         label.append(i * np.ones(mnist_all[key].shape[0]))
 
     data_mnist = np.vstack(data_mnist)
-    label = np.concatenate(label, axis=0)
-
+    label = np.concatenate(label, axis=0).astype(int)
     return data_mnist, label

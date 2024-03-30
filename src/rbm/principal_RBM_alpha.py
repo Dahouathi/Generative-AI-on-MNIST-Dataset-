@@ -40,7 +40,7 @@ def sortie_entree_rbm(rbm, h):
         return sigmoid(rbm['a'] + np.dot(h, rbm['W'].T))
 
 
-def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128):
+def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=False):
     """
     param X: training data
     param rbm: the RBM model
@@ -53,7 +53,9 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128):
         x = X.copy()
         np.random.shuffle(x)
         mse = 0
-
+        patience = 5 # Number of epochs to wait before early stopping
+        wait = 0
+        min_mse = np.inf  # Initialize minimum MSE to infinity
         for i in range(0, x.shape[0], batch_size):
             batch = x[i:i+batch_size]
             v0 = batch
@@ -76,14 +78,28 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128):
             rbm['a'] += learning_rate * grad_a / batch_size
             rbm['b'] += learning_rate * grad_b / batch_size
 
-            mse += np.mean((v0 - v1) ** 2)
-
+            mse += float(np.mean((v0 - v1) ** 2))
+            
         mse /= x.shape[0] // batch_size
-        print(f"Epoch {epoch + 1}/{epochs}, Mean Square Error : {mse}")
+        if verbose:
+            print(f"Epoch {epoch + 1}/{epochs}, Mean Square Error : {mse}")
+        # Check for improvement
+        if mse < min_mse:
+            min_mse = mse  # Update minimum MSE
+            wait = 0  # Reset wait counter
+        else:
+            wait += 1  # Increment wait counter
+
+        # Check for early stopping
+        if wait >= patience:
+            if verbose:
+                print("Early stopping due to no improvement in MSE.")
+            break
+        
 
     return rbm
 
-def generer_image_RBM(rbm, nb_images,x_shape=28, y_shape=28, nb_iterations=100, Plot=False ):
+def generer_image_RBM(rbm, nb_images,x_shape=28, y_shape=28, nb_iterations=100, Plot=True, save_path=None ):
     """
     param rbm: the trained RBM model
     param nb_iterations: number of iterations for Gibbs sampling
@@ -107,7 +123,9 @@ def generer_image_RBM(rbm, nb_images,x_shape=28, y_shape=28, nb_iterations=100, 
             plt.subplot(1, nb_images, i+1)
             plt.imshow(images[i].reshape((x_shape, y_shape)), cmap='gray')  
             plt.axis('off')
-        plt.show()
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.show(block=False)
 
     return np.array(images)
 

@@ -49,6 +49,9 @@ class RBM:
             x = X.copy()
             np.random.shuffle(x)
             mse = 0
+            patience = 5 # Number of epochs to wait before early stopping
+            wait = 0
+            min_mse = np.inf  # Initialize minimum MSE to infinity
 
             for i in range(0, x.shape[0], batch_size):
                 batch = x[i:i+batch_size]
@@ -69,10 +72,21 @@ class RBM:
                 self.a += learning_rate * grad_a / batch_size
                 self.b += learning_rate * grad_b / batch_size
 
-                mse += np.mean((v0 - v1) ** 2)
-
+                mse += float(np.mean((v0 - v1) ** 2))
             mse /= x.shape[0] // batch_size
             print(f"Epoch {epoch + 1}/{epochs}, Mean Square Error : {mse}")
+            # Check for improvement
+            if mse < min_mse:
+                min_mse = mse  # Update minimum MSE
+                wait = 0  # Reset wait counter
+            else:
+                wait += 1  # Increment wait counter
+
+            # Check for early stopping
+            if wait >= patience:
+                print("Early stopping due to no improvement in MSE.")
+                break
+            
             
     def generate_images(self, nb_images, x_shape=28, y_shape=28, nb_iterations=100, Plot=False):
         """

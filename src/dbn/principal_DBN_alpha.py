@@ -29,7 +29,7 @@ def init_DBN(sizes):
     
     return dbn
 
-def train_DBN(X, dbn, epochs=100, learning_rate=0.1, batch_size=128):
+def train_DBN(X, dbn, epochs=100, learning_rate=0.1, batch_size=128, verbose=False):
     """
     Train a Deep Belief Network (DBN) using the Contrastive Divergence (CD) algorithm
     
@@ -51,7 +51,7 @@ def train_DBN(X, dbn, epochs=100, learning_rate=0.1, batch_size=128):
     for i in range(n_layers):
         print('Training layer', i+1)
         rbm = {'W': dbn['W'][i], 'a': dbn['a'][i], 'b': dbn['b'][i]} # current RBM
-        train_RBM(X_train, rbm, epochs, learning_rate, batch_size)
+        train_RBM(X_train, rbm, epochs, learning_rate, batch_size, verbose)
         X_train = np.random.binomial(1, entree_sortie_rbm(rbm, X_train))
         dbn['W'][i] = rbm['W']
         dbn['b'][i] = rbm['b']
@@ -59,7 +59,7 @@ def train_DBN(X, dbn, epochs=100, learning_rate=0.1, batch_size=128):
     
     return dbn
 
-def generate_image_DBN(dbn, nb_images, x_shape=28, y_shape=28, nb_iterations=100, Plot=False):
+def generate_image_DBN(dbn, nb_images, x_shape=28, y_shape=28, nb_iterations=100, Plot=True, save_path=None):
     """
     Generates images using a Deep Belief Network (DBN).
 
@@ -89,5 +89,7 @@ def generate_image_DBN(dbn, nb_images, x_shape=28, y_shape=28, nb_iterations=100
             axes[i].imshow(images[i], cmap="gray")
             axes[i].axis("off")
         plt.suptitle(f"Number of layers {len(dbn['W'])}")
-        plt.show()
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.show(block=False)
     return images
