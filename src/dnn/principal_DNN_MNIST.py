@@ -153,6 +153,7 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
           
     
     if plot:
+        plt.figure()
         plt.plot(np.arange(len(loss)), loss)
         plt.xlabel("Epochs")
         plt.ylabel("CrossEntropy Loss")
@@ -163,6 +164,7 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
         plt.show(block=False)
+        plt.close()
     return dnn
 
 
@@ -177,8 +179,10 @@ def test_dnn(X, y, dnn, verbose=True):
 
 def plot_proba(data, dnn, n =10):
     _, pred_labels = entree_sortie_reseau(dnn, data)
+    plt.figure()
     plt.scatter(np.arange(0, n), pred_labels)
     plt.xlabel("Classes")
     plt.ylabel("Predicted probability for each class")
     plt.title("Probabilities by class")
     plt.show(block=False)
+    plt.close()
