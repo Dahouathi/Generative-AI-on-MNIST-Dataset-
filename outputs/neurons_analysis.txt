@@ -1,0 +1,65 @@
+Warning: The file ./models/dnn_mnist_pretrained_neurons100_fully_trained784100100.pkl does not exist.
+Model loaded from ./models/dnn_mnist_pretrained_neurons100784100100.pkl
+Pretrained model with 100 neurons loaded.
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_neurons100_fully_trained784100100.pkl
+Warning: The file ./models/dnn_mnist_random_neurons100_fully_trained784100100.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_neurons100784100100.pkl does not exist.
+Randomly initialized model with 100 neurons not found. Initializing a new model.
+[784, 100, 100, 10]
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_random_neurons100_fully_trained784100100.pkl
+Pretrained DNN accuracy with 100 neurons per layer: 0.9628
+Randomly initialized DNN accuracy with 100 neurons per layer: 0.9621
+Warning: The file ./models/dnn_mnist_pretrained_neurons200_fully_trained784200200.pkl does not exist.
+Warning: The file ./models/dnn_mnist_pretrained_neurons200784200200.pkl does not exist.
+Pretrained model with 200 neurons not found. Initializing and pretraining a new model.
+[784, 200, 200, 10]
+Training layer 1
+Training layer 2
+Model saved to ./models/dnn_mnist_pretrained_neurons200784200200.pkl
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_neurons200_fully_trained784200200.pkl
+Warning: The file ./models/dnn_mnist_random_neurons200_fully_trained784200200.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_neurons200784200200.pkl does not exist.
+Randomly initialized model with 200 neurons not found. Initializing a new model.
+[784, 200, 200, 10]
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_random_neurons200_fully_trained784200200.pkl
+Pretrained DNN accuracy with 200 neurons per layer: 0.9708
+Randomly initialized DNN accuracy with 200 neurons per layer: 0.9654
+Warning: The file ./models/dnn_mnist_pretrained_neurons300_fully_trained784300300.pkl does not exist.
+Warning: The file ./models/dnn_mnist_pretrained_neurons300784300300.pkl does not exist.
+Pretrained model with 300 neurons not found. Initializing and pretraining a new model.
+[784, 300, 300, 10]
+Training layer 1
+Training layer 2
+Model saved to ./models/dnn_mnist_pretrained_neurons300784300300.pkl
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_neurons300_fully_trained784300300.pkl
+Warning: The file ./models/dnn_mnist_random_neurons300_fully_trained784300300.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_neurons300784300300.pkl does not exist.
+Randomly initialized model with 300 neurons not found. Initializing a new model.
+[784, 300, 300, 10]
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_random_neurons300_fully_trained784300300.pkl
+Pretrained DNN accuracy with 300 neurons per layer: 0.9726
+Randomly initialized DNN accuracy with 300 neurons per layer: 0.9275
+Warning: The file ./models/dnn_mnist_pretrained_neurons700_fully_trained784700700.pkl does not exist.
+Warning: The file ./models/dnn_mnist_pretrained_neurons700784700700.pkl does not exist.
+Pretrained model with 700 neurons not found. Initializing and pretraining a new model.
+[784, 700, 700, 10]
+Training layer 1
+Training layer 2
+Model saved to ./models/dnn_mnist_pretrained_neurons700784700700.pkl
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_pretrained_neurons700_fully_trained784700700.pkl
+Warning: The file ./models/dnn_mnist_random_neurons700_fully_trained784700700.pkl does not exist.
+Warning: The file ./models/dnn_mnist_random_neurons700784700700.pkl does not exist.
+Randomly initialized model with 700 neurons not found. Initializing a new model.
+[784, 700, 700, 10]
+Early stopping due to no improvement in Loss.
+Model saved to ./models/dnn_mnist_random_neurons700_fully_trained784700700.pkl
+Pretrained DNN accuracy with 700 neurons per layer: 0.9782
+Randomly initialized DNN accuracy with 700 neurons per layer: 0.1135
+Plot saved to ./figs/neurons_analysis.png

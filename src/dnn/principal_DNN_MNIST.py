@@ -17,7 +17,7 @@ def init_DNN(sizes, output_size=10):
     print(configuration)
     return init_DBN(configuration)
 
-def pretrain_DNN(X, dnn, epochs=100, learning_rate=0.1, batch_size=128):
+def pretrain_DNN(X, dnn, epochs=100, learning_rate=0.1, batch_size=128, verbose=False):
     """
     Pretrain a Deep Neural Network (DNN) using the given data.
     param: X: training data
@@ -28,7 +28,7 @@ def pretrain_DNN(X, dnn, epochs=100, learning_rate=0.1, batch_size=128):
     return: the pretrained DNN model
     """
     dbn = dnn[:-1]
-    dbn = train_DBN(X, dbn, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
+    dbn = train_DBN(X, dbn, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size, verbose=verbose)
     dnn[:-1] = dbn
     return dnn
 
@@ -85,10 +85,10 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
     return: the trained DNN model"""
     # Convert y to one-hot encoded format using pd.get_dummies
     y_one_hot = pd.get_dummies(y).values
-    train_loss=100
+    previous_loss=100
     best_loss = float('inf')  # Initialize the minimum loss to infinity
     loss = []
-    patience = 5  # Number of epochs to wait before early stopping
+    patience = 7  # Number of epochs to wait before early stopping
     wait = 0
     
     for epoch in range(epochs):
@@ -139,18 +139,18 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
 
 
         # Calculate the cross entropy loss for the epoch
-        previous_loss=train_loss
+        
         train_loss = float(np.mean(loss_batches))
         loss.append(train_loss)
         if verbose:
             print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss}")
 
-        # Early stopping
-        if epoch>epochs/10:
+        # Early stopping strategy
+        if epoch>epochs//4:
             # Check if current loss is less than the best loss encountered so far
             if train_loss < best_loss:
                 # If so, update the best loss and reset wait
-                if abs(previous_loss - train_loss) < 1e-4: # if the loss is not decreasing
+                if abs(previous_loss - train_loss) < 1e-3: # if the loss is not decreasing
                     wait+=1
                 else:
                     wait = 0
@@ -163,7 +163,7 @@ def retropropagation(X, y, dnn, epochs=100, learning_rate=0.1, batch_size=128, v
         if wait >= patience:
             print("Early stopping due to no improvement in Loss.")
             break
-        
+        previous_loss=train_loss
           
     
     if plot:
@@ -193,12 +193,20 @@ def test_dnn(X, y, dnn, verbose=False):
 
 def box_plot_proba(data, dnn, k, save_path=None):
     _, proba_sortie = entree_sortie_reseau(dnn, data)
-    plt.figure()
-    sns.boxplot(data=proba_sortie)
-    plt.xlabel("Classes")
-    plt.ylabel("Predicted probability")
-    plt.title("Distribution of probabilities of the class {}".format(k))
+    
+    # Take the first 20 samples
+    proba_sortie = proba_sortie[:20]
+    
+    fig, axs = plt.subplots(5, 4, figsize=(15, 15))
+    axs = axs.ravel()
+    for i, probas in enumerate(proba_sortie):
+        axs[i].plot(range(10), probas)
+        axs[i].set_title(f'Sample {i+1}')
+        axs[i].set_xlabel('Classes')
+        axs[i].set_ylabel('Predicted probability')
+    plt.tight_layout()
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show(block=False)
     plt.close()
+    

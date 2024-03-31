@@ -50,10 +50,10 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=Fal
     :return the trained RBM model
     """
     # Initialize early stopping parameters
-    patience = 10  # Number of epochs to wait before early stopping
+    patience = 5  # Number of epochs to wait before early stopping
     wait = 0
     best_mse = float('inf')  # Initialize best MSE to infinity
-    
+    previous_mse = 100  # Initialize MSE to a high value
     for epoch in range(epochs):
         x = X.copy()
         np.random.shuffle(x)
@@ -83,6 +83,7 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=Fal
         # Calculate total MSE for this epoch
         h_epoch = entree_sortie_rbm(rbm, X)
         X_reconstructed = sortie_entree_rbm(rbm, h_epoch)
+        
         mse = np.mean((X_reconstructed - X) ** 2)
 
         if verbose:
@@ -90,14 +91,20 @@ def train_RBM(X, rbm, epochs=100, learning_rate=0.1, batch_size=128, verbose=Fal
         
         # Early stopping check
         if mse < best_mse:
+            if abs(previous_mse - mse) < 0.001:
+                wait += 1
+                if wait >= patience:
+                    print("Early stopping due to no significant improvement in MSE.")
+                    break
+            else:
+                wait = 0  # Reset wait since there was an improvement
             best_mse = mse  # Update the best MSE
-            wait = 0  # Reset wait since there was an improvement
         else:
             wait += 1  # Increment wait since there was no improvement
             if wait >= patience:
-                print("Early stopping due to no improvement in MSE.")
+                print("Early stopping due to MSE being higher than the best MSE for consecutive epochs.")
                 break  
-
+        previous_mse = mse
     return rbm
 
 def generer_image_RBM(rbm, nb_images,x_shape=28, y_shape=28, nb_iterations=100, Plot=True, save_path=None ):

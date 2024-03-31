@@ -5,6 +5,78 @@ from src.dbn import init_DBN, train_DBN, generate_image_DBN
 from src.dnn import init_DNN, pretrain_DNN, retropropagation, test_dnn, box_plot_proba
 import numpy as np
 
+
+
+
+def rbm_alphadigits_experiment(input_list):
+    """
+    Run an experiment to train a Restricted Boltzmann Machine (RBM) on the alphadigits dataset.
+    """
+    for i in input_list:
+        X = lire_alpha_digit(alphadigit_path, np.array([char_to_num[i]]))
+        _, p = X.shape
+        # Initialize the RBM model
+        rbm = init_RBM(p, 200)
+        
+        # Train the RBM model
+        train_RBM(X, rbm, epochs=epochs_rbm, learning_rate=learning_rate, batch_size=batch_size_rbm)
+        
+        # Generate images using the RBM model
+        generer_image_RBM(rbm, nb_images=nb_images, x_shape=x_shape, y_shape=y_shape,
+                           nb_iterations=nb_iterations, Plot=True, save_path='./figs/rbm_alphadigits{}.png'.format(i))
+
+def rbm_mixed_experiment(input_list):
+    """
+    Run an experiment to train a Restricted Boltzmann Machine (RBM) on a mixed dataset of MNIST and alphadigits.
+    """
+    input_list_ = [char_to_num[i] for i in input_list]
+    X = lire_alpha_digit(alphadigit_path, np.array(input_list_))
+    _, p = X.shape
+    # Initialize the RBM model
+    rbm = init_RBM(p, 200)
+    
+    # Train the RBM model
+    train_RBM(X, rbm, epochs=epochs_rbm, learning_rate=learning_rate, batch_size=batch_size_rbm)
+
+    input_list_str = '_'.join(str(i) for i in input_list)
+    # Generate images using the RBM model
+    generer_image_RBM(rbm, nb_images=nb_images, x_shape=x_shape, y_shape=y_shape,
+                      nb_iterations=nb_iterations, Plot=True, save_path='./figs/rbm_mixed{}.png'.format(input_list_str))
+def dbn_experiment(input_list, layers, neurones):
+    """
+    Run an experiment to train a Deep Belief Network (DBN) on the MNIST dataset.
+    """
+    for i in input_list:
+        X = lire_alpha_digit(alphadigit_path, np.array([char_to_num[i]]))
+        _, p = X.shape
+        # Initialize the DBN model with the specified layers and neurones
+        dbn = init_DBN([p] + [neurones[0] for _ in range(layers[0])])
+        
+        # Train the DBN model
+        dbn = train_DBN(X, dbn, epochs=epochs_rbm, learning_rate=learning_rate, batch_size=batch_size_rbm)
+        
+        # Generate images using the DBN model
+        generate_image_DBN(dbn, nb_images=nb_images, x_shape=x_shape, y_shape=y_shape,
+                           nb_iterations=nb_iterations, Plot=True, save_path='./figs/dbn_digits{}{}{}.png'.format(layers, neurones, i))
+
+def dbn_mixed_experiment(input_list, layers, neurones):
+    """
+    Run an experiment to train a Deep Belief Network (DBN) on a mixed dataset of MNIST and alphadigits.
+    """
+    input_list_ = [char_to_num[i] for i in input_list]
+    X = lire_alpha_digit(alphadigit_path, np.array(input_list_))
+    _, p = X.shape
+    # Initialize the DBN model with the specified layers and neurones
+    dbn = init_DBN([p] + [neurones[0] for _ in range(layers[0])])
+    
+    # Train the DBN model
+    dbn = train_DBN(X, dbn, epochs=epochs_rbm, learning_rate=learning_rate, batch_size=batch_size_rbm)
+
+    input_list_str = '_'.join(str(i) for i in input_list)
+    # Generate images using the DBN model
+    generate_image_DBN(dbn, nb_images=nb_images, x_shape=x_shape, y_shape=y_shape,
+                      nb_iterations=nb_iterations, Plot=True, save_path='./figs/dbn_mixed{}{}{}.png'.format(layers,neurones,input_list_str))
+
 def first_run_experiment():
     """
     Run the first experiment to train a Deep Neural Network (DNN) on the MNIST dataset.
@@ -346,15 +418,24 @@ epochs_rbm = 100
 epochs_dnn = 200
 learning_rate = 0.1
 batch_size = 128
+batch_size_rbm = 10
 nb_iterations = 500 
 nb_images = 4
 
 # Load the data
-data_path = 'data/MNIST/mnist_all.mat'
-X_train, y_train = lire_mnist(data_path, np.arange(10), 'train')
-X_test, y_test = lire_mnist(data_path, np.arange(10), 'test')
+MNIST_path = 'data/MNIST/mnist_all.mat'
+X_train, y_train = lire_mnist(MNIST_path, np.arange(10), 'train')
+X_test, y_test = lire_mnist(MNIST_path, np.arange(10), 'test')
 _, p_mnist = X_train.shape
 
+alphadigit_path = 'data/binary_alpha_digits/binaryalphadigs.mat'
+
+# Define the mapping between characters and numbers
+char_to_num = {str(i): i for i in range(10)}  # Digits '0'-'9'
+char_to_num.update({chr(65+i-10): (i) for i in range(10, 36)})  # Letters 'A'-'Z'
+# Reverse mapping
+num_to_char = {i: str(i) for i in range(10)}  # Digits 0-9
+num_to_char.update({i: chr(65+i-10) for i in range(10, 36)})  # Letters A-Z
 
 
 
@@ -380,9 +461,43 @@ parser.add_argument('--layers', nargs='+', type=int, help="List of layer counts 
 parser.add_argument('--neurons', nargs='+', type=int, help="List of neuron counts per layer to test, separated by spaces.")
 parser.add_argument('--train_sizes', nargs='+', type=int, help="List of training sizes to test, separated by spaces.")
 
+# New arguments for RBM and DBN
+parser.add_argument('--rbm', choices=['digits', 'alphabets', 'mix_digits', 'mix_alphabets', 'mix_both'],
+                    help="Run RBM experiments. Choose one: 'digits', 'alphabets', 'mix_digits', 'mix_alphabets', 'mix_both'.")
+parser.add_argument('--rbm_input', nargs='+', type=str, help="List of numbers specifying input for RBM experiments, separated by spaces.")
+
+# New arguments for RBM and DBN
+parser.add_argument('--dbn', choices=['digits', 'alphabets', 'mix'],
+                    help="Run DBN experiments. Choose one: 'digits', 'alphabets', 'mix_digits', 'mix_alphabets', 'mix_both'.")
+parser.add_argument('--dbn_input', nargs='+', type=str, help="List of numbers specifying input for RBM experiments, separated by spaces.")
+
+parser.add_argument('--layer', nargs='+', type=int, default=[2], help="List of numbers specifying layers for DBN experiments, separated by spaces.")
+parser.add_argument('--neurone', nargs='+', type=int, default=[200], help="List of numbers specifying neurones for each layer in DBN experiments, separated by spaces.")
+
+
 args = parser.parse_args()
 
-if args.experiment_type == 'first_run':
+if args.rbm:
+    if args.rbm_input:
+        
+        if args.rbm == 'digits':
+            # Run the RBM experiment for the MNIST dataset
+            rbm_alphadigits_experiment(args.rbm_input)
+        elif args.rbm == 'alphabets':
+            # Run the RBM experiment for the alphadigits dataset
+            rbm_alphadigits_experiment(args.rbm_input)
+        elif args.rbm == 'mix_digits' or args.rbm == 'mix_alphabets' or args.rbm == 'mix_both':
+            # Run the RBM experiment for the mixed dataset of MNIST and alphadigits
+            rbm_mixed_experiment(args.rbm_input)
+elif args.dbn:
+    if args.dbn_input:
+        if args.dbn == 'digits' or args.dbn == 'alphabets':
+            # Run the DBN experiment for the MNIST dataset
+            dbn_experiment(args.dbn_input, args.layer, args.neurone)
+        elif args.dbn == 'mix':
+            # Run the DBN experiment for the mixed dataset of MNIST and alphadigits
+            dbn_mixed_experiment(args.dbn_input, args.layer, args.neurone)
+elif args.experiment_type == 'first_run':
     # Here, you would call a function to run the first experiment
     first_run_experiment()
 elif args.experiment_type == 'compare':
